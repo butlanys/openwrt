@@ -25,18 +25,20 @@ jobs:
         rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
     
     - name: Clone OpenWRT source code
-      run: git clone -b openwrt-23.05 https://github.com/openwrt/openwrt.git ./
+      run: git clone -b openwrt-23.05 https://github.com/openwrt/openwrt.git
 
     - name: Copy configuration file
-      run: cp config_default/.config .
+      run: cp config_default/.config openwrt/
 
     - name: Update and install feeds
       run: |
+        cd openwrt/
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
     - name: Download and compile OpenWRT
       run: |
+        cd openwrt/
         make download -j$(nproc)
         make V=s -j$(nproc)
 
@@ -44,4 +46,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: openwrt-build
-        path: bin/targets/ # 替换为编译后固件所在的目录
+        path: openwrt/bin/targets/ # 替换为编译后固件所在的目录
